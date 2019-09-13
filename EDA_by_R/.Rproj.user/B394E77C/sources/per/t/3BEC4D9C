@@ -1,0 +1,29 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1544606565213.000,
+    "dirty" : false,
+    "encoding" : "",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "3BEC4D9C",
+    "lastKnownWriteTime" : 6,
+    "last_content_update" : 1544606565213,
+    "path" : null,
+    "project_path" : null,
+    "properties" : {
+        "cacheKey" : "F792602F",
+        "caption" : "tsmip",
+        "contentUrl" : "grid_resource/gridviewer.html?env=&obj=tsmip&cache_key=F792602F",
+        "displayedObservations" : "91141",
+        "environment" : "",
+        "object" : "tsmip",
+        "preview" : "0",
+        "totalObservations" : "91141",
+        "variables" : "3"
+    },
+    "relative_order" : 7,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_dataframe"
+}

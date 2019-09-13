@@ -1,0 +1,3 @@
+"0","tsmip<-read.csv('TSMIP_distinguish.csv',header = F)"
+"0","ASUS<-read.csv('ASUS.csv',header = F)"
+"0","tsmip_predict<-read.csv('TSMIP_predict.csv',header = F)"

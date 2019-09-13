@@ -1,0 +1,113 @@
+---
+title: "SVM for predict earthquake"
+author: "r06521607"
+date: "2018年10月30日"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(e1071)
+library(tidyverse)
+library(stringr)
+library(dplyr)
+library(stats)
+library(plotly)
+options(stringsAsFactors = F)
+```
+
+# 0.load data
+```{r}
+tsmip<-read.csv('TSMIP_distinguish.csv',header = F)
+ASUS<-read.csv('ASUS.csv',header = F)
+
+tsmip_predict<-read.csv('TSMIP_predict.csv',header = F)
+
+```
+
+# 1.process data
+```{r}
+names<-c("ZC","IQR","CAV")
+names(ASUS)<-names
+names(tsmip)<-names
+
+#normalize
+
+ASUS<-ASUS%>%
+  #mutate(ZC=(ZC-min(ZC))/(max(ZC)-min(ZC)))%>%
+  #mutate(IQR=(IQR-min(IQR))/(max(IQR)-min(IQR)))%>%
+  #mutate(CAV=(CAV-min(CAV))/(max(CAV)-min(CAV)))%>%
+  mutate(labels=0)
+
+tsmip<-tsmip%>%
+  #mutate(ZC=(ZC-min(ZC))/(max(ZC)-min(ZC)))%>%
+  #mutate(IQR=(IQR-min(IQR))/(max(IQR)-min(IQR)))%>%
+  #mutate(CAV=(CAV-min(CAV))/(max(CAV)-min(CAV)))%>%
+  mutate(labels=1)
+
+#train_data<-bind_rows(tsmip,ASUS)
+
+```
+
+# 2.SVM
+
+```{r}
+# 隨機構建訓練集與測試集
+# 70%資料為訓練集，其餘為測試集
+set.seed(2018)
+
+all<-ASUS%>%
+  bind_rows(tsmip)
+all_samples<-sample(1:nrow(all),size = round(nrow(all)*0.7))
+all_train<-all%>%slice(all_samples)
+all_test<-all[-all_samples,]
+
+#asus_samples<-sample(1:nrow(ASUS),size = round(nrow(ASUS)*0.7))
+#tsmip_samples<-sample(1:nrow(tsmip),size = round(nrow(tsmip)*0.7))
+
+#asus_train_set<-ASUS%>%slice(asus_samples)
+#tsmip_train_set<-tsmip%>%slice(tsmip_samples)
+
+asus_test_set<-ASUS[-asus_samples,]
+tsmip_test_set<-tsmip[-tsmip_samples,]
+
+#samples <- sample(1:nrow(train_data), 
+ #                 size = round(nrow(train_data)*0.7))
+
+#trainset <- bind_rows(asus_train_set,tsmip_train_set)
+#testset <- bind_rows(asus_test_set,tsmip_test_set)
+
+
+
+# 建立 SVM 分類器model，機器學習主體函式
+# labels~ 表示除去labels的資料，其他數據均進入機器學習中。 labels之資料作為分類標的。
+# kernel 表示svm之核函式，此次選用Radial
+model <- svm(labels~ ., data = all_train, kernel="radial")
+
+# 預測函式主體
+predicting  <- predict(model, all_test[, -ncol(all_test)])
+
+# 對比統計預測與實際之差
+table(predicting, all_test$labels)
+
+# 計算預測準確率
+pre <- predicting == all_test$labels
+percent1 <- length(pre[pre == T]) / length(pre)
+percent1
+
+
+head(train_data)
+```
+# 3.Visualization
+```{r}
+train_data$labels<-as.factor(train_data$labels)
+
+p <- plot_ly(train_data, x = ~ZC, y = ~IQR, z = ~CAV, color = ~labels, colors = c('#BF382A', '#0C4B8E'),size=5) %>%
+  add_markers() %>%
+  layout(scene = list(xaxis = list(title = 'ZC'),
+                     yaxis = list(title = 'IQR'),
+                     zaxis = list(title = 'CAV')))
+
+p
+```
+
+
